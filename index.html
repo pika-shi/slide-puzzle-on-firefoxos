@@ -3,9 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Slide Puzzle</title>
-    <script type="text/javascript" src="http://code.createjs.com/easeljs-0.5.0.min.js"></script>
-    <script type="text/javascript" src="http://code.createjs.com/preloadjs-0.1.0.min.js"></script>
-    <script type="text/javascript" src="http://code.createjs.com/tweenjs-0.3.0.min.js"></script>
+    <script src="http://code.createjs.com/createjs-2013.12.12.min.js" type="text/javascript"></script>
     <link rel="stylesheet" href="style/action_menu.css">
     <link rel="stylesheet" href="style/buttons.css">
     <link rel="stylesheet" href="style/confirm.css">
@@ -213,7 +211,7 @@
         <h1>Slide Puzzle</h1>
       </header>
       <article class="content scrollable header">
-      <img class="img" src="img/top_image.png" width="60%">
+      <img class="img" src="img/top_image.png" alt="Logo" height="60%">
       <button class="reccomend" id="startButton">START</button>
       </article>
     </section>
@@ -226,13 +224,13 @@
         <h1>Slide Puzzle</h1>
       </header>
       <article class="content scrollable header">
-        <canvas id='canvas' width="640" height="640" style="background-color:#cecece; width:320px; height:320px;"></canvas>
+        <canvas id='eight' class="canvas" style="background-color:#cecece; width:80%; height:60%;"></canvas>
       </article>
       </section>
 
     <script type="text/javascript" defer src="js/status.js"></script>
     <script type="text/javascript" defer src="js/seekbars.js"></script>
     <script type="text/javascript" defer src="js/app.js"></script>
-
+    <script type="text/javascript" src="js/main.js"></script>
   </body>
 </html>
