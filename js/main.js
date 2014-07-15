@@ -64,7 +64,6 @@ function setPanel(window){
       positions[i+1] = {x: (i % 3) * panel_width, y: ~~(i / 3) * panel_width};
   }
 
-
   for (var i = 0; i < 8 ; i++) {
     panel = new cj.Bitmap(assets[i+1]);
     panel.x = (i % 3) * panel_width;
@@ -83,10 +82,7 @@ function setPanel(window){
   cj.Ticker.addEventListener('tick', tickHandler);
   cj.Ticker.useRAF = true;
 
-  //cj.Tween.get(panels[8]).to({x: panel_width*2, y: panel_width*2}, 5000);
-
   function clickHandler(event) {
-    console.log(event.target.name);
     movePanel(event.target);
   }
 
@@ -95,18 +91,55 @@ function setPanel(window){
   }
 
   function movePanel(panel) {
+    console.log(panel.name);
+    console.log(panel_positions[panel.name]);
     switch(panel_positions[panel.name]) {
+      case 1:
+        move(panel, [2, 4]);
+        break;
+      case 2:
+        move(panel, [1, 3, 5]);
+        break;
+      case 3:
+        move(panel, [2, 6]);
+        break;
+      case 4:
+        move(panel, [1, 5, 7]);
+        break;
+      case 5:
+        move(panel, [2, 4, 6, 8]);
+        break;
+      case 6:
+        move(panel, [3, 5, 9]);
+        break;
+      case 7:
+        move(panel, [4, 8]);
+        break;
       case 8:
-        var closed_list = [5,7,9];
-        for (var j = 0; j < closed_list.length; j++) {
-          for (var i = 0; i < 8; i++) {
-            if (panel_positions[i+1] == closed_list[j]) {
-              continue;
-            }
-            console.log(closed_list[j]);
-            cj.Tween.get(panel).to(positions[closed_list[j]], 1000);
-          }
+        move(panel, [5, 7, 9]);
+        break;
+      case 9:
+        move(panel, [6, 8]);
+        break;
+    }
+  }
+
+  function move(panel, closed_list) {
+    var b;
+    for (var i = 0; i < closed_list.length; i++) {
+      b = true;
+      for (var j = 0; j < 8; j++) {
+        if (panel_positions[j+1] == closed_list[i]) {
+          b = false;
+          break;
         }
+      }
+      if(b) {
+        cj.Tween.get(panel).to(positions[closed_list[i]], 400);
+        panel_positions[panel.name] = closed_list[i];
+        console.log(panel_positions[panel.name]);
+        console.log(panel_positions);
+      }
     }
   }
 }
