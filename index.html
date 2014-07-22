@@ -212,7 +212,7 @@
       </header>
       <article class="content scrollable header">
       <img class="img" src="img/top_image.png" alt="Logo" height="60%">
-      <button class="reccomend" id="startButton">START</button>
+      <button id="startButton">START</button>
       </article>
     </section>
 
@@ -224,7 +224,13 @@
         <h1>Slide Puzzle</h1>
       </header>
       <article class="content scrollable header">
+      <div align="center"><h2 class="timer" id="timer">00:00</h2></div>
         <canvas id='eight' class="canvas" style="background-color:#cecece;"></canvas>
+        <div align="center">
+          <button class="gameButton" id="puzzleStartButton">START</button>
+          <button class="gameButton" id="puzzleStopButton">STOP</button>
+          <button class="gameButton" id="puzzleResetButton">RESET</button>
+        </div>
       </article>
       </section>
 

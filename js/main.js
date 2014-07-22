@@ -1,7 +1,9 @@
-var assets = {};
+var cj = createjs, canvas, stage, stage_width;
+var assets = {}, panels = {}, panel_positions = {}, positions = {};
+var clear_back, clear_text;
+var timer, count, second, clear = true;
 
 function load() {
-  var cj = createjs;
 
   var loadManifest = [
         {id:1, src:"./img/panel/1.png"},
@@ -19,6 +21,8 @@ function load() {
         {id:13, src:"./img/panel/13.png"},
         {id:14, src:"./img/panel/14.png"},
         {id:15, src:"./img/panel/15.png"},
+        {id:"clear_back", src:"./img/clear/back.png"},
+        {id:"clear_text", src:"./img/clear/text.png"},
   ];
 
   var loader = new cj.LoadQueue();
@@ -43,8 +47,7 @@ window.addEventListener("load", function loadHandler(evt) {
 }, false);
 
 function setPanel(window){
-  var cj = createjs, canvas, stage, stage_width;
-  var panels = {}, panel, panel_width;
+  var panel, panel_width;
 
   canvas = document.getElementById("eight");
   stage_width = window.innerWidth - 60;
@@ -52,11 +55,7 @@ function setPanel(window){
   canvas.width = stage_width;
   canvas.height = stage_width;
   stage = new cj.Stage(canvas);
-  if (cj.Touch.isSupported()) {
-    cj.Touch.enable(stage);
-  }
 
-  var panel_positions = {}, positions = {};
   for (var i = 0; i < 8; i++) {
       panel_positions[i+1] = i+1;
   }
@@ -76,6 +75,15 @@ function setPanel(window){
     panel.addEventListener('click', clickHandler);
   }
 
+  clear_back = new cj.Bitmap(assets["clear_back"]);
+  clear_back.y = - stage_width;
+  clear_back.scaleX = stage_width / clear_back.image.width;
+  clear_back.scaleY = stage_width / clear_back.image.width;
+  clear_back.alpha = 0.7;
+  clear_text = new cj.Bitmap(assets["clear_text"]);
+  clear_text.scaleX = stage_width / (clear_text.image.width);
+  clear_text.y = - (stage_width + clear_text.image.height) / 2.;
+
   stage.update();
 
   cj.Ticker.setFPS(60);
@@ -84,62 +92,127 @@ function setPanel(window){
 
   function clickHandler(event) {
     movePanel(event.target);
+    checkClear();
   }
 
   function tickHandler(event) {
     stage.update();
   }
+}
 
-  function movePanel(panel) {
-    console.log(panel.name);
-    console.log(panel_positions[panel.name]);
-    switch(panel_positions[panel.name]) {
-      case 1:
-        move(panel, [2, 4]);
-        break;
-      case 2:
-        move(panel, [1, 3, 5]);
-        break;
-      case 3:
-        move(panel, [2, 6]);
-        break;
-      case 4:
-        move(panel, [1, 5, 7]);
-        break;
-      case 5:
-        move(panel, [2, 4, 6, 8]);
-        break;
-      case 6:
-        move(panel, [3, 5, 9]);
-        break;
-      case 7:
-        move(panel, [4, 8]);
-        break;
-      case 8:
-        move(panel, [5, 7, 9]);
-        break;
-      case 9:
-        move(panel, [6, 8]);
-        break;
+function movePanel(panel) {
+  switch(panel_positions[panel.name]) {
+    case 1:
+      move(panel, [2, 4]);
+      break;
+    case 2:
+      move(panel, [1, 3, 5]);
+      break;
+    case 3:
+      move(panel, [2, 6]);
+      break;
+    case 4:
+      move(panel, [1, 5, 7]);
+      break;
+    case 5:
+      move(panel, [2, 4, 6, 8]);
+      break;
+    case 6:
+      move(panel, [3, 5, 9]);
+      break;
+    case 7:
+      move(panel, [4, 8]);
+      break;
+    case 8:
+      move(panel, [5, 7, 9]);
+      break;
+    case 9:
+      move(panel, [6, 8]);
+      break;
     }
   }
 
-  function move(panel, closed_list) {
-    var b;
-    for (var i = 0; i < closed_list.length; i++) {
-      b = true;
-      for (var j = 0; j < 8; j++) {
-        if (panel_positions[j+1] == closed_list[i]) {
-          b = false;
-          break;
-        }
+function move(panel, closed_list) {
+  var b;
+  for (var i = 0; i < closed_list.length; i++) {
+    b = true;
+    for (var j = 0; j < 8; j++) {
+      if (panel_positions[j+1] == closed_list[i]) {
+        b = false;
+        break;
       }
-      if(b) {
-        cj.Tween.get(panel).to(positions[closed_list[i]], 400);
-        panel_positions[panel.name] = closed_list[i];
-        console.log(panel_positions[panel.name]);
-        console.log(panel_positions);
-      }
+    }
+    if(b) {
+      cj.Tween.get(panel).to(positions[closed_list[i]], 300);
+      panel_positions[panel.name] = closed_list[i];
     }
   }
 }
+
+function checkClear() {
+  for (var i = 0; i < 8; i++) {
+    if (panel_positions[i+1] != i+1) {
+      return;
+    }
+  }
+  cj.Tween.get(clear_back).to({x: 0, y: 0}, 500);
+  cj.Tween.get(clear_text).to({x: 0, y: (stage_width - clear_text.image.height) / 2}, 500);
+  stage.addChild(clear_back);
+  stage.addChild(clear_text);
+  clear = true;
+  clearInterval(timer);
+}
+
+document.getElementById("puzzleStartButton").addEventListener("click", startTimer);
+document.getElementById("puzzleStopButton").addEventListener("click", stopTimer);
+document.getElementById("puzzleResetButton").addEventListener("click", resetTimer);
+
+function sufflePanels() {
+  
+}
+
+function resetClearView() {
+  stage.removeChild(clear_back);
+  stage.removeChild(clear_text);
+  clear_back.y = - stage_width;
+  clear_text.y = - (stage_width + clear_text.image.height) / 2.;
+}
+
+function startTimer() {
+  if (clear == true) {
+    count = 0;
+    resetClearView();
+  }
+  clear = false;
+  sufflePanels();
+  timer = setInterval("countTime()", 10);
+}
+
+function countTime() {
+  count += 1;
+  second = (count < 1000) ? "0" + parseInt(count / 100, 10) : parseInt(count / 100, 10);
+  msecond = (count % 100 < 10) ? "0" + count % 100 : count % 100;
+  document.getElementById("timer").innerHTML = second + ":" + msecond;
+}
+
+function stopTimer() {
+  clearInterval(timer);
+}
+
+function resetTimer() {
+  resetClearView();
+  count = 0;
+  document.getElementById("timer").innerHTML = "00:00";
+}
+
+
+
+
+
+
+
+
+
+
+
+
