@@ -149,6 +149,23 @@ function move(panel, closed_list) {
   }
 }
 
+function sufflePanels() {
+  var rand1, rand2, tmp;
+  for (var i = 0; i < 20; i++) {
+    rand1 = Math.floor(1 + Math.random() * 8);
+    do {
+      rand2 = Math.floor(1 + Math.random() * 8);
+    } while (rand1 == rand2);
+    tmp = panel_positions[rand1];
+    panel_positions[rand1] = panel_positions[rand2];
+    panel_positions[rand2] = tmp;
+  }
+  console.log(panel_positions);
+  for (var i = 0; i < 8; i++) {
+    cj.Tween.get(panels[i+1]).to(positions[panel_positions[i+1]]);
+  }
+}
+
 function checkClear() {
   for (var i = 0; i < 8; i++) {
     if (panel_positions[i+1] != i+1) {
@@ -166,10 +183,6 @@ function checkClear() {
 document.getElementById("puzzleStartButton").addEventListener("click", startTimer);
 document.getElementById("puzzleStopButton").addEventListener("click", stopTimer);
 document.getElementById("puzzleResetButton").addEventListener("click", resetTimer);
-
-function sufflePanels() {
-  
-}
 
 function resetClearView() {
   stage.removeChild(clear_back);
