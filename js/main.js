@@ -166,6 +166,12 @@ function sufflePanels() {
   }
 }
 
+function setPanelsDefaultPosition() {
+  for (var i = 0; i < 8; i++) {
+    cj.Tween.get(panels[i+1]).to(positions[i+1]);
+  }
+}
+
 function checkClear() {
   for (var i = 0; i < 8; i++) {
     if (panel_positions[i+1] != i+1) {
@@ -195,9 +201,9 @@ function startTimer() {
   if (clear == true) {
     count = 0;
     resetClearView();
+    sufflePanels();
   }
   clear = false;
-  sufflePanels();
   timer = setInterval("countTime()", 10);
 }
 
@@ -214,7 +220,10 @@ function stopTimer() {
 
 function resetTimer() {
   resetClearView();
+  clearInterval(timer);
+  setPanelsDefaultPosition();
   count = 0;
+  clear = true;
   document.getElementById("timer").innerHTML = "00:00";
 }
 
