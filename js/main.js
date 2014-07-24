@@ -1,7 +1,11 @@
 var cj = createjs, canvas, stage, stage_width;
 var assets = {}, panels = {}, panel_positions = {}, positions = {};
 var clear_back, clear_text;
-var timer, count, second, clear = true;
+var timer = false, count, second, clear = true;
+
+var startButton = document.getElementById("puzzleStartButton");
+var stopButton = document.getElementById("puzzleStopButton");
+var resetButton = document.getElementById("puzzleResetButton");
 
 function load() {
 
@@ -39,6 +43,11 @@ function load() {
   loader.addEventListener("fileload", fileloadHandler);
   loader.addEventListener("complete", completeHandler);
   loader.load();
+
+  startButton.addEventListener("click", startTimer);
+  stopButton.addEventListener("click", stopTimer);
+  resetButton.addEventListener("click", resetTimer);
+  startButton.disabled = false;
 }
 
 window.addEventListener("load", function loadHandler(evt) {
@@ -91,8 +100,10 @@ function setPanel(window){
   cj.Ticker.useRAF = true;
 
   function clickHandler(event) {
-    movePanel(event.target);
-    checkClear();
+    if (timer) {
+      movePanel(event.target);
+      checkClear();
+    }
   }
 
   function tickHandler(event) {
@@ -168,6 +179,7 @@ function sufflePanels() {
 
 function setPanelsDefaultPosition() {
   for (var i = 0; i < 8; i++) {
+    panel_positions[i+1] = i+1;
     cj.Tween.get(panels[i+1]).to(positions[i+1]);
   }
 }
@@ -184,11 +196,8 @@ function checkClear() {
   stage.addChild(clear_text);
   clear = true;
   clearInterval(timer);
+  startButton.disabled = false;
 }
-
-document.getElementById("puzzleStartButton").addEventListener("click", startTimer);
-document.getElementById("puzzleStopButton").addEventListener("click", stopTimer);
-document.getElementById("puzzleResetButton").addEventListener("click", resetTimer);
 
 function resetClearView() {
   stage.removeChild(clear_back);
@@ -198,13 +207,14 @@ function resetClearView() {
 }
 
 function startTimer() {
-  if (clear == true) {
+  startButton.disabled = true;
+  if (clear) {
     count = 0;
     resetClearView();
     sufflePanels();
   }
-  clear = false;
   timer = setInterval("countTime()", 10);
+  clear = false;
 }
 
 function countTime() {
@@ -215,15 +225,19 @@ function countTime() {
 }
 
 function stopTimer() {
+  startButton.disabled = false;
   clearInterval(timer);
+  timer = false;
 }
 
 function resetTimer() {
+  startButton.disabled = false;
   resetClearView();
   clearInterval(timer);
   setPanelsDefaultPosition();
   count = 0;
   clear = true;
+  timer = false;
   document.getElementById("timer").innerHTML = "00:00";
 }
 
