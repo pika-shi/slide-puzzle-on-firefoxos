@@ -38,7 +38,7 @@ function load() {
   function completeHandler(evt) {
     loader.removeEventListener("fileload", fileloadHandler);
     loader.removeEventListener("complete", completeHandler);
-  　setPanel(window);
+    setPanel(window);
   }
   loader.addEventListener("fileload", fileloadHandler);
   loader.addEventListener("complete", completeHandler);
