@@ -211,7 +211,7 @@
         <h1>Slide Puzzle</h1>
       </header>
       <article class="content scrollable header">
-        <img class="img" src="img/top_image.png" alt="Logo" width="65%">
+        <img class="img" src="img/top_image.png" alt="Logo" width="70%">
         <div align="center">
           <label class="pack-radio">
             <input type="radio" name="puzzle-kind" checked>
@@ -223,14 +223,15 @@
             <span></span>
           </label>
           <span class="radio-text">15 Puzzle</span>
+          <button class="topButton" id="startButton">START</button>
+          <button class="topButton" id="recordButton">RECORD</button>
         </div>
-        <button id="startButton">START</button>
       </article>
     </section>
 
     <section role="region" id="puzzle" data-position="right">
       <header class="fixed">
-        <a id="backButton" href="#">
+        <a id="puzzleBackButton" href="#">
           <span class="icon icon-back">back</span>
         </a>
         <h1>Slide Puzzle</h1>
@@ -243,6 +244,18 @@
           <button class="gameButton" id="puzzleStopButton">STOP</button>
           <button class="gameButton" id="puzzleResetButton">RESET</button>
         </div>
+      </article>
+      </section>
+      
+      <section role="region" id="record" data-position="right">
+      <header class="fixed">
+        <a id="recordBackButton" href="#">
+          <span class="icon icon-back">back</span>
+        </a>
+        <h1>Slide Puzzle</h1>
+      </header>
+      <article class="content scrollable header">
+      <div align="center"><h2 class="record-title" id="record-title"></h2></div>
       </article>
       </section>
 

@@ -1,18 +1,19 @@
 var cj = createjs, canvas, stage, stage_width, puzzle_num, puzzle_width_num;
 var assets = {}, panels = {}, panel_positions = {}, positions = {};
 var clear_back, clear_text;
-var timer = false, count, second, clear = true;
+var timer = false, count, second, msecond, clear = true;
 
 var gameStartButton = document.getElementById("startButton");
+var recordButton = document.getElementById("recordButton");
 var startButton = document.getElementById("puzzleStartButton");
 var stopButton = document.getElementById("puzzleStopButton");
 var resetButton = document.getElementById("puzzleResetButton");
-var backButton = document.getElementById("backButton");
+var backButton = document.getElementById("puzzleBackButton");
 var puzzle_kind = document.getElementsByName("puzzle-kind");
 
 function load() {
 
-  startButton.disabled = true;
+  startButton.disabled = false;
 
   var loadManifest = [
         {id:1, src:"./img/panel/1.png"},
@@ -44,7 +45,6 @@ function load() {
   function completeHandler(evt) {
     loader.removeEventListener("fileload", fileloadHandler);
     loader.removeEventListener("complete", completeHandler);
-    //setPanel(window);
     createInstances();
     gameStartButton.addEventListener("click", setPanel);
   }
@@ -57,12 +57,19 @@ function load() {
   stopButton.addEventListener("click", stopTimer);
   resetButton.addEventListener("click", resetTimer);
   backButton.addEventListener("click", back);
+  recordButton.addEventListener("click", recordData);
 }
 
 window.addEventListener("load", function loadHandler(evt) {
   window.removeEventListener("load", loadHandler, false);
   load();
 }, false);
+
+function recordData() {
+  puzzle_num = puzzle_kind[0].checked ? 8 : 15;
+  document.getElementById("record-title").innerHTML = puzzle_num + " PUZZLE RECORD";
+  console.log("aaa");
+}
 
 function createInstances() {
   for (var i = 0; i < 15; i++) {
@@ -88,6 +95,7 @@ function setPanel(){
   puzzle_num = puzzle_kind[0].checked ? 8 : 15;
   puzzle_width_num = (puzzle_num == 8) ? 3 : 4;
 
+  localStorage.removeItem(puzzle_num);
   canvas = document.getElementById("puzzle_stage");
   stage_width = window.innerWidth - 60;
   panel_width = stage_width / puzzle_width_num;
@@ -270,6 +278,9 @@ function checkClear() {
   cj.Tween.get(clear_text).to({x: 0, y: (stage_width - clear_text.image.height) / 2}, 500);
   stage.addChild(clear_back);
   stage.addChild(clear_text);
+  var record_list = (localStorage[puzzle_num]) ? JSON.parse(localStorage[puzzle_num]) : [];
+  record_list.push(count);
+  localStorage[puzzle_num] = JSON.stringify(record_list);
   clear = true;
   clearInterval(timer);
   startButton.disabled = false;
@@ -316,15 +327,3 @@ function resetTimer() {
   timer = false;
   document.getElementById("timer").innerHTML = "00:00";
 }
-
-
-
-
-
-
-
-
-
-
-
-
