@@ -68,7 +68,6 @@ window.addEventListener("load", function loadHandler(evt) {
 function recordData() {
   puzzle_num = puzzle_kind[0].checked ? 8 : 15;
   document.getElementById("record-title").innerHTML = puzzle_num + " PUZZLE RECORD";
-  console.log("aaa");
 }
 
 function createInstances() {
