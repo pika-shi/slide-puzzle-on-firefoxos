@@ -1,4 +1,4 @@
-var cj = createjs, canvas, stage, stage_width;
+var cj = createjs, canvas, stage, stage_width, puzzle_num, puzzle_width_num;
 var assets = {}, panels = {}, panel_positions = {}, positions = {};
 var clear_back, clear_text;
 var timer = false, count, second, clear = true;
@@ -7,9 +7,12 @@ var gameStartButton = document.getElementById("startButton");
 var startButton = document.getElementById("puzzleStartButton");
 var stopButton = document.getElementById("puzzleStopButton");
 var resetButton = document.getElementById("puzzleResetButton");
+var backButton = document.getElementById("backButton");
 var puzzle_kind = document.getElementsByName("puzzle-kind");
 
 function load() {
+
+  startButton.disabled = true;
 
   var loadManifest = [
         {id:1, src:"./img/panel/1.png"},
@@ -42,6 +45,7 @@ function load() {
     loader.removeEventListener("fileload", fileloadHandler);
     loader.removeEventListener("complete", completeHandler);
     //setPanel(window);
+    createInstances();
     gameStartButton.addEventListener("click", setPanel);
   }
 
@@ -52,6 +56,7 @@ function load() {
   startButton.addEventListener("click", startTimer);
   stopButton.addEventListener("click", stopTimer);
   resetButton.addEventListener("click", resetTimer);
+  backButton.addEventListener("click", back);
 }
 
 window.addEventListener("load", function loadHandler(evt) {
@@ -59,44 +64,56 @@ window.addEventListener("load", function loadHandler(evt) {
   load();
 }, false);
 
-function setPanel(){
-  var panel, panel_width;
-
-  var puzzle_num = puzzle_kind[0].checked ? 8 : 15;
-  console.log(puzzle_num);
-
-  canvas = document.getElementById("puzzle_stage");
-  stage_width = window.innerWidth - 60;
-  panel_width = stage_width / 3;
-  canvas.width = stage_width;
-  canvas.height = stage_width;
-  stage = new cj.Stage(canvas);
-
-  for (var i = 0; i < 8; i++) {
-      panel_positions[i+1] = i+1;
-  }
-  for (var i = 0; i < 9; i++) {
-      positions[i+1] = {x: (i % 3) * panel_width, y: ~~(i / 3) * panel_width};
-  }
-
-  for (var i = 0; i < 8 ; i++) {
+function createInstances() {
+  for (var i = 0; i < 15; i++) {
     panel = new cj.Bitmap(assets[i+1]);
-    panel.x = (i % 3) * panel_width;
-    panel.y = ~~(i / 3) * panel_width;
-    panel.scaleX = stage_width / (panel.image.width * 3.);
-    panel.scaleY = stage_width / (panel.image.width * 3.);
     panel.name = i+1;
     panels[i+1] = panel;
-    stage.addChild(panel);
     panel.addEventListener('click', clickHandler);
   }
 
   clear_back = new cj.Bitmap(assets["clear_back"]);
+  clear_text = new cj.Bitmap(assets["clear_text"]);
+
+  function clickHandler(event) {
+    if (timer) {
+      movePanel(event.target);
+      checkClear();
+    }
+  }
+}
+
+function setPanel(){
+  var panel, panel_width;
+  puzzle_num = puzzle_kind[0].checked ? 8 : 15;
+  puzzle_width_num = (puzzle_num == 8) ? 3 : 4;
+
+  canvas = document.getElementById("puzzle_stage");
+  stage_width = window.innerWidth - 60;
+  panel_width = stage_width / puzzle_width_num;
+  canvas.width = stage_width;
+  canvas.height = stage_width;
+  stage = new cj.Stage(canvas);
+
+  for (var i = 0; i < puzzle_num; i++) {
+      panel_positions[i+1] = i+1;
+  }
+  for (var i = 0; i < puzzle_num + 1; i++) {
+      positions[i+1] = {x: (i % puzzle_width_num) * panel_width, y: ~~(i / puzzle_width_num) * panel_width};
+  }
+
+  for (var i = 0; i < puzzle_num ; i++) {
+    panels[i+1].x = (i % puzzle_width_num) * panel_width;
+    panels[i+1].y = ~~(i / puzzle_width_num) * panel_width;
+    panels[i+1].scaleX = stage_width / (panels[i+1].image.width * puzzle_width_num);
+    panels[i+1].scaleY = stage_width / (panels[i+1].image.width * puzzle_width_num);
+    stage.addChild(panels[i+1]);
+  }
+
   clear_back.y = - stage_width;
   clear_back.scaleX = stage_width / clear_back.image.width;
   clear_back.scaleY = stage_width / clear_back.image.width;
   clear_back.alpha = 0.7;
-  clear_text = new cj.Bitmap(assets["clear_text"]);
   clear_text.scaleX = stage_width / (clear_text.image.width);
   clear_text.y = - (stage_width + clear_text.image.height) / 2.;
 
@@ -106,55 +123,107 @@ function setPanel(){
   cj.Ticker.addEventListener('tick', tickHandler);
   cj.Ticker.useRAF = true;
 
-  function clickHandler(event) {
-    if (timer) {
-      movePanel(event.target);
-      checkClear();
-    }
-  }
 
   function tickHandler(event) {
     stage.update();
   }
 }
 
+function back() {
+  resetTimer();
+  delete stage;
+}
+
 function movePanel(panel) {
-  switch(panel_positions[panel.name]) {
-    case 1:
-      move(panel, [2, 4]);
-      break;
-    case 2:
-      move(panel, [1, 3, 5]);
-      break;
-    case 3:
-      move(panel, [2, 6]);
-      break;
-    case 4:
-      move(panel, [1, 5, 7]);
-      break;
-    case 5:
-      move(panel, [2, 4, 6, 8]);
-      break;
-    case 6:
-      move(panel, [3, 5, 9]);
-      break;
-    case 7:
-      move(panel, [4, 8]);
-      break;
-    case 8:
-      move(panel, [5, 7, 9]);
-      break;
-    case 9:
-      move(panel, [6, 8]);
-      break;
+  if (puzzle_num == 8) {
+    switch(panel_positions[panel.name]) {
+      case 1:
+        move(panel, [2, 4]);
+        break;
+      case 2:
+        move(panel, [1, 3, 5]);
+        break;
+      case 3:
+        move(panel, [2, 6]);
+        break;
+      case 4:
+        move(panel, [1, 5, 7]);
+        break;
+      case 5:
+        move(panel, [2, 4, 6, 8]);
+        break;
+      case 6:
+        move(panel, [3, 5, 9]);
+        break;
+      case 7:
+        move(panel, [4, 8]);
+        break;
+      case 8:
+        move(panel, [5, 7, 9]);
+        break;
+      case 9:
+        move(panel, [6, 8]);
+        break;
+     }
+  } else {
+    switch(panel_positions[panel.name]) {
+      case 1:
+        move(panel, [2, 5]);
+        break;
+      case 2:
+        move(panel, [1, 3, 6]);
+        break;
+      case 3:
+        move(panel, [2, 4, 7]);
+        break;
+      case 4:
+        move(panel, [3, 8]);
+        break;
+      case 5:
+        move(panel, [1, 6, 9]);
+        break;
+      case 6:
+        move(panel, [2, 5, 7, 10]);
+        break;
+      case 7:
+        move(panel, [3, 6, 8, 11]);
+        break;
+      case 8:
+        move(panel, [4, 7, 12]);
+        break;
+      case 9:
+        move(panel, [5, 10, 13]);
+        break;
+      case 10:
+        move(panel, [6, 9, 11, 14]);
+        break;
+      case 11:
+        move(panel, [7, 10, 12, 15]);
+        break;
+      case 12:
+        move(panel, [8, 11, 16]);
+        break;
+      case 13:
+        move(panel, [9, 14]);
+        break;
+      case 14:
+        move(panel, [10, 13, 15]);
+        break;
+      case 15:
+        move(panel, [11, 14, 16]);
+        break;
+      case 16:
+        move(panel, [12, 15]);
+        break;
     }
   }
+}
 
 function move(panel, closed_list) {
   var b;
   for (var i = 0; i < closed_list.length; i++) {
     b = true;
-    for (var j = 0; j < 8; j++) {
+    for (var j = 0; j < puzzle_num; j++) {
       if (panel_positions[j+1] == closed_list[i]) {
         b = false;
         break;
@@ -165,34 +234,34 @@ function move(panel, closed_list) {
       panel_positions[panel.name] = closed_list[i];
     }
   }
+  console.log(panel_positions);
 }
 
 function sufflePanels() {
   var rand1, rand2, tmp;
   for (var i = 0; i < 20; i++) {
-    rand1 = Math.floor(1 + Math.random() * 8);
+    rand1 = Math.floor(1 + Math.random() * puzzle_num);
     do {
-      rand2 = Math.floor(1 + Math.random() * 8);
+      rand2 = Math.floor(1 + Math.random() * puzzle_num);
     } while (rand1 == rand2);
     tmp = panel_positions[rand1];
     panel_positions[rand1] = panel_positions[rand2];
     panel_positions[rand2] = tmp;
   }
-  console.log(panel_positions);
-  for (var i = 0; i < 8; i++) {
+  for (var i = 0; i < puzzle_num; i++) {
     cj.Tween.get(panels[i+1]).to(positions[panel_positions[i+1]]);
   }
 }
 
 function setPanelsDefaultPosition() {
-  for (var i = 0; i < 8; i++) {
+  for (var i = 0; i < puzzle_num; i++) {
     panel_positions[i+1] = i+1;
     cj.Tween.get(panels[i+1]).to(positions[i+1]);
   }
 }
 
 function checkClear() {
-  for (var i = 0; i < 8; i++) {
+  for (var i = 0; i < puzzle_num; i++) {
     if (panel_positions[i+1] != i+1) {
       return;
     }
