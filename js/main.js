@@ -3,9 +3,11 @@ var assets = {}, panels = {}, panel_positions = {}, positions = {};
 var clear_back, clear_text;
 var timer = false, count, second, clear = true;
 
+var gameStartButton = document.getElementById("startButton");
 var startButton = document.getElementById("puzzleStartButton");
 var stopButton = document.getElementById("puzzleStopButton");
 var resetButton = document.getElementById("puzzleResetButton");
+var puzzle_kind = document.getElementsByName("puzzle-kind");
 
 function load() {
 
@@ -35,11 +37,14 @@ function load() {
   function fileloadHandler(event) {
     assets[event.item.id] = event.result;
   }
+
   function completeHandler(evt) {
     loader.removeEventListener("fileload", fileloadHandler);
     loader.removeEventListener("complete", completeHandler);
-    setPanel(window);
+    //setPanel(window);
+    gameStartButton.addEventListener("click", setPanel);
   }
+
   loader.addEventListener("fileload", fileloadHandler);
   loader.addEventListener("complete", completeHandler);
   loader.load();
@@ -47,7 +52,6 @@ function load() {
   startButton.addEventListener("click", startTimer);
   stopButton.addEventListener("click", stopTimer);
   resetButton.addEventListener("click", resetTimer);
-  startButton.disabled = false;
 }
 
 window.addEventListener("load", function loadHandler(evt) {
@@ -55,10 +59,13 @@ window.addEventListener("load", function loadHandler(evt) {
   load();
 }, false);
 
-function setPanel(window){
+function setPanel(){
   var panel, panel_width;
 
-  canvas = document.getElementById("eight");
+  var puzzle_num = puzzle_kind[0].checked ? 8 : 15;
+  console.log(puzzle_num);
+
+  canvas = document.getElementById("puzzle_stage");
   stage_width = window.innerWidth - 60;
   panel_width = stage_width / 3;
   canvas.width = stage_width;

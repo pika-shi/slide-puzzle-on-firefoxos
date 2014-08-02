@@ -28,3 +28,13 @@ header
 {
   background-color: #f39c12 !important;
 }
+
+.radio-text
+{
+    font-size: 1.9rem;
+  }
+
+.pack-radio
+{
+  margin: 0px 0px 0.5rem;
+}
