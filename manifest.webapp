@@ -2,6 +2,11 @@
   "name": "SlidePuzzle",
   "description": "Slide Puzzle",
   "launch_path": "/index.html",
+  "version": "1.0",
+  "developer": {
+    "name": "Hikaru Takemura",
+    "url": "http://pika-shi.hatenablog.com/"
+  },
   "icons": {
     "128": "/img/icons/icon_128.png"
   },
