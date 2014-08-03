@@ -66,8 +66,31 @@ window.addEventListener("load", function loadHandler(evt) {
 }, false);
 
 function recordData() {
+  var count, pre, time, sec, msec;
   puzzle_num = puzzle_kind[0].checked ? 8 : 15;
   document.getElementById("record-title").innerHTML = puzzle_num + " PUZZLE RECORD";
+  var record_list = (localStorage[puzzle_num]) ? JSON.parse(localStorage[puzzle_num]) : [];
+  record_list.sort(function(a, b) {return (b-a);});
+  for (var i = 0; i < 5; i++) {
+    pre = document.getElementById("pre" + (i+1));
+    time = document.getElementById("time" + (i+1));
+    time.innerHTML = "--------";
+    if (pre) { pre.innerHTML = "";}
+    if (record_list.length > 0) {
+      count = record_list.pop();
+      if (count < 1000) {
+        pre.innerHTML = "00";
+        pre.style.visibility = "hidden";
+      } else if (count < 10000) {
+        pre.innerHTML = "0";
+        pre.style.visibility = "hidden";
+      }
+
+      sec = parseInt(count / 100, 10);
+      msec = (count % 100 < 10) ? "0" + count % 100 : count % 100;
+      time.innerHTML = sec + ":" + msec;
+    }
+  }
 }
 
 function createInstances() {
@@ -94,7 +117,6 @@ function setPanel(){
   puzzle_num = puzzle_kind[0].checked ? 8 : 15;
   puzzle_width_num = (puzzle_num == 8) ? 3 : 4;
 
-  localStorage.removeItem(puzzle_num);
   canvas = document.getElementById("puzzle_stage");
   stage_width = window.innerWidth - 60;
   panel_width = stage_width / puzzle_width_num;
@@ -241,7 +263,6 @@ function move(panel, closed_list) {
       panel_positions[panel.name] = closed_list[i];
     }
   }
-  console.log(panel_positions);
 }
 
 function sufflePanels() {
